@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VeriLand Protocol | Digital Finance</title>
+
+    <style>
+        :root {
+            --primary: #5dade2;
+            --secondary: #9b59b6;
+            --accent: #2ecc71;
+            --dark: #222;
+            --light: #f4f7fe;
+            --danger: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff, #eef3ff);
+            text-align: center;
+            color: var(--dark);
+            scroll-behavior: smooth;
+            min-height: 100vh;
+        }
+
+        /* NAVIGATION */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 8%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        /* DASHBOARD AREA */
+        #dashboard {
+            display: none;
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--accent);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* MODAL & GLASSMORPHISM */
+        #walletModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 35px;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* SSO BUTTONS */
+        .modal-divider {
+            font-size: 12px;
+            color: #aaa;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .modal-divider::before,
+        .modal-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+
+        .sso-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-sso {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #555;
+            transition: 0.2s;
+        }
+
+        .btn-sso:hover {
+            background: #f9f9f9;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-sso img {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* FORM STYLES */
+        .contact-card {
+            background: white;
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            margin: 50px auto;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            background: #fcfcfc;
+            font-size: 16px;
+        }
+
+        /* BUTTONS */
+        button,
+        .btn-link {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-blue {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #eee;
+            color: #555;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-logout {
+            background: #fff;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 8px 15px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* UTILS */
+        .logo-img {
+            width: 150px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .glow {
+            text-shadow: 0 0 15px rgba(93, 173, 226, 0.3);
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-logo">VERILAND</div>
+        <div id="nav-user-zone">
+            <a href="http://127.0.0.1:5501/Ilmez%20Sosial%20Media/index.html" class="btn-link btn-blue"
+                style="width: auto;">Get Started</a>
+        </div>
+    </nav>
+
+    <div id="dashboard">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="text-align: left;">
+                <h3 id="welcomeText" style="margin:0;">Welcome, Explorer!</h3>
+                <p id="userType" style="font-size: 12px; color: #888; margin: 5px 0 0 0;">Status: Verified User</p>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="margin:0; color: var(--accent);">$4,250.50</h2>
+                <small style="color: #999;">Personal Balance</small>
+            </div>
+        </div>
+    </div>
+
+    <header style="margin-top: 40px;">
+        <img src="https://via.placeholder.com/150/5dade2/ffffff?text=VERILAND" alt="VeriLand Logo" class="logo-img">
+        <h1 class="glow">VeriLand Protocol</h1>
+        <p style="color: #666; max-width: 500px; margin: 10px auto;">Empowering your digital future through
+            decentralized wealth intelligence and secure asset management.</p>
+    </header>
+
+    <main>
+        <div class="stats-grid">
+            <div>
+                <h3 style="margin-bottom:5px;">$12.5M</h3>
+                <p style="margin:0; color:#888;">TVL</p>
+            </div>
+            <div>
+                <h3 style="margin-bottom:5px;">24/7</h3>
+                <p style="margin:0; color:#888;">Uptime</p>
+            </div>
+            <div>
+                <h3 style="margin-bottom:5px;">0.001%</h3>
+                <p style="margin:0; color:#888;">Low Fee</p>
+            </div>
+        </div>
+
+        <div class="contact-card" id="contact">
+            <h2 style="margin-top: 0;">📩 Contact Support</h2>
+            <form onsubmit="handleContact(event)">
+                <input type="text" id="name" placeholder="Full Name" required>
+                <input type="email" id="email" placeholder="Email Address" required>
+                <textarea id="message" rows="4" placeholder="How can we help you?"></textarea>
+                <button type="submit" id="submitBtn" class="btn-blue">Send Message</button>
+            </form>
+        </div>
+    </main>
+
+    <div id="walletModal">
+        <div class="modal-content">
+            <h2 style="margin-top: 0;">Sign In</h2>
+            <p style="font-size: 14px; color: #777; margin-bottom: 25px;">Select your preferred connection method to
+                access your dashboard.</p>
+
+            <button class="btn-outline" style="text-align: left; padding-left: 20px;"
+                onclick="mockConnect('MetaMask', '🦊')">🦊 MetaMask</button>
+            <button class="btn-outline" style="text-align: left; padding-left: 20px;"
+                onclick="mockConnect('Trust Wallet', '🛡️')">🛡️ Trust Wallet</button>
+
+            <div class="modal-divider">OR CONTINUE WITH</div>
+
+            <div class="sso-grid">
+                <button class="btn-sso" onclick="mockSSO('Google')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="G"> Google
+                </button>
+                <button class="btn-sso" onclick="mockSSO('Microsoft')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/732/732221.png" alt="M"> Microsoft
+                </button>
+                <button class="btn-sso" onclick="mockSSO('LinkedIn')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="L"> LinkedIn
+                </button>
+                <button class="btn-sso" onclick="mockSSO('Apple')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/0/747.png" alt="A"> Apple
+                </button>
+            </div>
+
+            <p style="font-size: 11px; color: #aaa; margin-top: 25px;">
+                By connecting, you agree to our
+                <a href="#" style="color: var(--primary); text-decoration: none;">Terms of Service</a>.
+            </p>
+
+            <button onclick="closeModal()"
+                style="background:none; color: #999; margin-top: 15px; font-size: 14px;">Cancel</button>
+        </div>
+    </div>
+
+    <footer style="margin-top: 80px; padding: 40px; border-top: 1px solid #eee; color: #999; font-size: 14px;">
+        <p>© 2026 VeriLand Protocol | <a href="#" style="color: var(--primary); text-decoration: none;">GitHub
+                Official</a></p>
+    </footer>
+
+    <script>
+        // UI LOGIC
+        function openModal() { document.getElementById('walletModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('walletModal').style.display = 'none'; }
+
+        // FUNGSI UPDATE UI SETELAH LOGIN
+        function finalizeLogin(name, detail) {
+            closeModal();
+            document.getElementById('nav-user-zone').innerHTML = `
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="color:var(--accent); font-weight:bold; font-size: 14px;">● Connected</span>
+        <button class="btn-logout" onclick="location.reload()">Logout</button>
+      </div>
+    `;
+
+            document.getElementById('welcomeText').innerText = "Welcome back, " + name + "!";
+            document.getElementById('userType').innerText = detail;
+            document.getElementById('dashboard').style.display = 'block';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // SIMULASI KONEKSI WALLET
+        function mockConnect(walletName, icon) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="loading-spinner"></span> Connecting...`;
+
+            setTimeout(() => {
+                alert("Success! Connected via " + walletName);
+                finalizeLogin("Web3 User", "Wallet: 0x71C...a290 (" + walletName + ")");
+            }, 1200);
+        }
+
+        // SIMULASI SSO LOGIN
+        function mockSSO(provider) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+
+            setTimeout(() => {
+                alert("Redirecting to " + provider + " authentication...");
+                finalizeLogin("Social Explorer", "Authenticated via " + provider);
+            }, 1000);
+        }
+
+        // SIMULASI FORM CONTACT
+        function handleContact(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const name = document.getElementById('name').value;
+
+            btn.innerText = "Sending...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert("Thank you " + name + "! Your message has been sent to the VeriLand team.");
+                btn.innerText = "Send Message";
+                btn.disabled = false;
+                e.target.reset();
+            }, 1500);
+        }
+    </script>
+
+</body>
+
+</html>
